@@ -1,0 +1,13 @@
+<h2>
+  Liste des Posts :
+  <small>( {{ posts.length }}
+  <ng-container *ngIf="posts.length>1">élements</ng-container>
+  <ng-container *ngIf="posts.length<=1">élement</ng-container>
+  )</small>
+</h2>
+<ul class="list-group">
+  <app-post-list-item 
+  	*ngFor="let post of posts"
+  	[post]="post"
+  ></app-post-list-item>
+</ul>

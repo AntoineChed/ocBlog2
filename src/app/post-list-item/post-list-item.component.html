@@ -1,0 +1,20 @@
+<div [ngClass]="{
+    'list-group-item' : true,
+    'list-group-item-success' : (post.loveIts>0),
+    'list-group-item-danger' : (post.loveIts===0)
+}">
+  <div class="list-group-item-heading">
+    <span class="pull-right">{{ post.created_at | date: 'shortDate':'+0200':'fr-FR' }}</span>
+    <h2>{{ post.title }}</h2>
+  </div>
+  <div class="list-group-item-text">
+    {{ post.content }}
+    <div class="list-buttons">
+      <a class="btn btn-success" (click)="onUpdateLoveIts(1)"><em class="fa fa-thumbs-up"></em> Love it !</a>
+      <a class="btn btn-warning" (click)="onUpdateLoveIts(-1)"><em class="fa fa-thumbs-down"></em> Don't love it !</a>
+      <span class="numberOfLoves">{{ post.loveIts }} <em class="fa fa-heart"></em></span>
+
+      <a class="btn btn-danger pull-right" (click)="onDeletePost()"><em class="fa fa-times"></em> Delete Post</a>
+    </div>
+  </div>
+</div>
