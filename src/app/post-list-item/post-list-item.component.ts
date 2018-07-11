@@ -15,8 +15,7 @@ export class PostListItemComponent implements OnInit {
     private postsService: PostsService
     ) { }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   onUpdateLoveIts(n: number) {
     return this.postsService.incrementeLoveIts(this.post, n);

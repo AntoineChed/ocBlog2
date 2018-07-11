@@ -1,47 +1,37 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Post } from '../models/post.model';
+import * as firebase from 'firebase';
+import { DataSnapshot } from 'firebase/database';
 
 export class PostsService {
 
-	posts: Post[] = [
-      new Post({
-        'title' : 'Mon premier post',
-        'content' : 'Lorem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ip' +
-        'sum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum',
-      }),
-      new Post({
-        'title' : 'Mon deuxième post',
-        'content' : 'Lorem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ip' +
-        'sum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum',
-      }),
-      new Post({
-        'title' : 'Mon troisième post',
-        'content' : 'Lorem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ip' +
-        'sum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum',
-      }),
-        new Post({
-        'title' : 'Mon quatrième post',
-        'content' : 'Lorem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ip' +
-        'sum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum orem ipsum Lorem ipsum Lorem ipsum',
-      })
-    ];
-
+  posts: Post[] = [];
 	postsSubject = new Subject<Post[]>();
 
-  	constructor() { }
+  constructor() { }
 
-  	emitPosts(){
-  		this.postsSubject.next(this.posts);
-  	}
+  emitPosts(){
+  	this.postsSubject.next(this.posts);
+  }
 
-  	getPosts(){
-  		return this.posts;
-  	}
+  getPosts(){
+    firebase.database().ref('/posts')
+        .on('value', (data: DataSnapshot) => {
+            this.posts = data.val() ? data.val() : [];
+            this.emitPosts();
+          }
+        );
+  }
 
-  	createNewPost(newPost: Post) {
-	    this.posts.push(newPost);
-	    this.emitPosts();
+  savePosts(){
+    firebase.database().ref('/posts').set(this.posts);
+  }
+
+  createNewPost(newPost: Post) {
+	  this.posts.push(newPost);
+	  this.savePosts();
+    this.emitPosts();
 	}
 
 	removePost(post: Post) {
@@ -53,11 +43,12 @@ export class PostsService {
 		  }
 		);
 		this.posts.splice(postIndexToRemove, 1);
-		this.emitPosts();
+		this.savePosts();
+    this.emitPosts();
 	}
 
 	incrementeLoveIts(post: Post, n: number) {
-    	const indexOfPost = this.posts.findIndex(
+  	const indexOfPost = this.posts.findIndex(
 		  (postEl) => {
 		    if(postEl === post) {
 		      return true;
@@ -65,10 +56,11 @@ export class PostsService {
 		  }
 		);
 
-    	this.posts[indexOfPost].loveIts += n;
-    	this.posts[indexOfPost].loveIts = (this.posts[indexOfPost].loveIts < 0) ? 0 : this.posts[indexOfPost].loveIts
-    	this.emitPosts();
+  	this.posts[indexOfPost].loveIts += n;
+  	this.posts[indexOfPost].loveIts = (this.posts[indexOfPost].loveIts < 0) ? 0 : this.posts[indexOfPost].loveIts
+  	this.savePosts();
+    this.emitPosts();
 
-    	return this.posts[indexOfPost].loveIts;
-  	}
+  	return this.posts[indexOfPost].loveIts;
+	}
 }
